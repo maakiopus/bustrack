@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bus30 Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .header {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        #timestamp {
+            font-size: 0.9rem;
+            color: #ddd;
+            display: flex;
+            gap: 15px;
+        }
+
+        .timestamp-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .timestamp-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .relative-time {
+            color: #4CAF50;
+        }
+
+        #map-container {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            
+            #timestamp {
+                font-size: 0.8rem;
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bus30 Tracker</h1>
+            <div id="timestamp">
+                <div class="timestamp-item">
+                    <span class="timestamp-label">Status:</span>
+                    <span id="relative-time" class="relative-time">Not yet updated</span>
+                </div>
+                <div class="timestamp-item">
+                    <span class="timestamp-label">Last Update:</span>
+                    <span id="absolute-time">-</span>
+                </div>
+            </div>
+        </div>
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize map
+        var map = L.map('map').setView([17.3871, 78.4916], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Custom bus icon
+        var base64icon = "data:image/png;base64,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";
+        var busIcon = L.icon({
+            iconUrl: base64icon,
+            iconSize: [41, 41],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -20]
+        });
+
+        var marker = L.marker([17.3871, 78.4916], {icon: busIcon}).addTo(map);
+        marker.bindPopup("Bus 30").openPopup();
+
+        var lastUpdateTime = null;
+
+        function formatRelativeTime(timestamp) {
+            const now = new Date();
+            const updated = new Date(timestamp);
+            const diffInSeconds = Math.floor((now - updated) / 1000);
+
+            if (diffInSeconds < 5) return 'Latest';
+            if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+            
+            const diffInMinutes = Math.floor(diffInSeconds / 60);
+            if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+            
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+            
+            const diffInDays = Math.floor(diffInHours / 24);
+            return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+        }
+
+        function formatAbsoluteTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        function updateTimestampDisplay() {
+            if (lastUpdateTime) {
+                document.getElementById('relative-time').textContent = formatRelativeTime(lastUpdateTime);
+                document.getElementById('absolute-time').textContent = formatAbsoluteTime(lastUpdateTime);
+            }
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            map.invalidateSize();
+        });
+
+        // Socket.IO connection
+        var socket = io();
+        
+        function updateLocation() {
+            socket.emit('request_location');
+        }
+
+        socket.on('location_update', function(data) {
+            marker.setLatLng([data.lat, data.lng]);
+            map.panTo([data.lat, data.lng]);
+            lastUpdateTime = data.timestamp;
+            console.log(`${data.lat},${data.lng}`);
+
+            updateTimestampDisplay();
+        });
+
+        // Update location every 5 seconds
+        setInterval(updateLocation, 5000);
+
+        // Update relative timestamp every second
+        setInterval(updateTimestampDisplay, 1000);
+
+        updateLocation();  // Initial update
+    </script>
+</body>
+</html>

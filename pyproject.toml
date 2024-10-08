@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "webdash"
+version = "0.1.0"
+description = ""
+authors = ["maaki <maaki@duck.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+flask = "^3.0.3"
+flask-socketio = "^5.4.1"
+findmy = "^0.7.5"
+gunicorn = "^23.0.0"
+gevent = "^24.2.1"
+gevent-websocket = "^0.10.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
