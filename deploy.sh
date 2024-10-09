@@ -25,7 +25,8 @@ ssh $SERVER_USER@$SERVER_IP << 'EOF'
     echo "Done Updating"
 EOF
 
-ssh $SERVER_USER@$SERVER_IP << 'EOF'
+# Restart
+ssh $SERVER_ADM@$SERVER_IP << 'EOF'
     sudo supervisorctl restart bus30tracker
     echo "Done Deploying"
 EOF
