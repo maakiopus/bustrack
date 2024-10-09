@@ -1,4 +1,4 @@
-# 
+# Taken From https://github.com/malmeloo/FindMy.py/blob/main/examples/_login.py
 # ruff: noqa: ASYNC230
 
 import json
