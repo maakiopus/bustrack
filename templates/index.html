@@ -107,8 +107,10 @@
     </div>
 
     <script>
+        const int_lat = {{ latitude }};
+        const int_lng = {{ longitude }};
         // Initialize map
-        var map = L.map('map').setView([17.3871, 78.4916], 15);
+        var map = L.map('map').setView([int_lat,int_lng], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
@@ -121,9 +123,6 @@
             iconAnchor: [20, 20],
             popupAnchor: [0, -20]
         });
-
-        const int_lat = {{ latitude }};
-        const int_lng = {{ longitude }};
 
         var marker = L.marker([int_lat,int_lng], {icon: busIcon}).addTo(map);
         marker.bindPopup("Bus 30").openPopup();
