@@ -46,7 +46,7 @@ get_tracker_location()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html',latitude=latitude,longitude=longitude)
 
 @socketio.on('request_location')
 def handle_location_request():

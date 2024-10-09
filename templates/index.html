@@ -122,7 +122,10 @@
             popupAnchor: [0, -20]
         });
 
-        var marker = L.marker([17.3871, 78.4916], {icon: busIcon}).addTo(map);
+        const int_lat = {{ latitude }};
+        const int_lng = {{ longitude }};
+
+        var marker = L.marker([int_lat,int_lng], {icon: busIcon}).addTo(map);
         marker.bindPopup("Bus 30").openPopup();
 
         var lastUpdateTime = null;
