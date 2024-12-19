@@ -7,6 +7,8 @@ from _login import get_account_sync
 from findmy import KeyPair
 from findmy.reports import RemoteAnisetteProvider
 
+sleep_sec = 6
+
 # Initialize variables for Location Tracking
 latitude = 0.0
 longitude = 0.0
@@ -41,12 +43,13 @@ print(f"Logged in as: {acc.account_name} ({acc.first_name} {acc.last_name})")
 
 while True:
     now = datetime.now()
-    if (now.hour > 18) or (now.hour < 6):
+    # if (now.hour > 18) or (now.hour < 6):
+    if (1 == 1):
         oldtime = timestamp
         get_tracker_location()
 
         if oldtime == timestamp:
-            print("uh oh no update")
+            sleep(sleep_sec)
             continue
 
         data = {
@@ -74,7 +77,6 @@ while True:
         else:
             with open(json_path, 'w') as jsonfile:
                 json.dump([data], jsonfile, indent=4)
-        
+
         print(f"Appended telemetry time:{timestamp} lat:{latitude} lng:{longitude}")
-    
-    sleep(8)
+    sleep(sleep_sec)
