@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bus30 Tracker</title>
+    <title>BusTrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
@@ -89,7 +89,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Bus30 Tracker</h1>
+            <h1>BusTrack</h1>
             <div id="timestamp">
                 <div class="timestamp-item">
                     <span class="timestamp-label">Status:</span>
@@ -125,7 +125,6 @@
         });
 
         var marker = L.marker([int_lat,int_lng], {icon: busIcon}).addTo(map);
-        marker.bindPopup("Bus 30").openPopup();
 
         var lastUpdateTime = null;
 
